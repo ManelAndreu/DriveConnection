@@ -35,8 +35,9 @@ import java.io.OutputStream;
 
 public class Main22Activity extends AppCompatActivity {
     GoogleApiClient googleApiClient;
-    DriveApi.DriveContentsResult dcr;
-    EditText ed;
+    private boolean isReaded = false;
+    static String text;
+     EditText ed;
     private DriveId id;
 
     @Override
@@ -49,7 +50,20 @@ public class Main22Activity extends AppCompatActivity {
         googleApiClient = MainActivity.getGoogleApiClient();
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         id = DriveId.decodeFromString(getIntent().getExtras().getString("id"));
+        text = "";
         final DriveFile df = id.asDriveFile();
+        final Lectura llig = new Lectura();
+
+        llig.execute(df);
+
+        while(!isReaded){
+            if(text == ""){
+
+            }else{
+                ed.setText(text);
+                isReaded = true;
+            }
+        }
         final Escritura escriu = new Escritura();
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -86,97 +100,13 @@ public class Main22Activity extends AppCompatActivity {
         PendingResult<DriveApi.DriveContentsResult> opened = df.open(googleApiClient, DriveFile.MODE_READ_WRITE, null);
         opened.setResultCallback(contentsOpenedCallback);
 
-
-
-
-
-
-
-
-
-      /*  fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-                Drive.DriveApi.newDriveContents(googleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-                    @Override
-                    public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
-                        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                                .setMimeType("text/plane").build();
-
-                    *//*    FileOutputStream fos = null;
-                        try {
-                            fos = openFileOutput(String.valueOf(ed.getText()), Context.MODE_APPEND);
-                            Log.i("TAG", "openFileOutput");
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-*//*
-
-                        FileInputStream fin = null;
-                        try {
-                            fin = openFileInput("Holaaa");
-                            DataInputStream dis = new DataInputStream(fin);
-                            byte[] buff = new byte[1024];
-                            driveContentsResult.getDriveContents().getOutputStream().write(dis.read(buff));
-
-
-                            Log.i("TAG", "openFileIntput");
-                            fin.close();
-                            dis.close();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        // Write the bitmap data from it.
-                       *//* OutputStream os =  driveContentsResult.getDriveContents().getOutputStream();
-                        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-                        byte[] buff = bitmapStream.
-                        try {
-                            dos.write();
-
-
-                            DataOutputStream dos = new DataOutputStream(fos);
-                        // Write the bitmap data from it.
-                        ByteArrayOutputStream bytearray = new ByteArrayOutputStream();*//*
-
-                     *//*   try {
-
-                            dos.writeBytes("hola")
-
-
-                            Log.i("TAG", "Writing");
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }*//*
-
-
-                        IntentSender intentSender = Drive.DriveApi
-                                .newCreateFileActivityBuilder()
-                                .setInitialMetadata(metadataChangeSet)
-                                .setInitialDriveContents(driveContentsResult.getDriveContents())
-                                .build(googleApiClient);
-
-
-                        try {
-//                            Toast.makeText(getApplicationContext(), "Entre", Toast.LENGTH_SHORT).show();
-                            startIntentSenderForResult(intentSender, MainActivity.REQUEST_CODE_CREATOR, null, 0, 0, 0);
-
-
-                        } catch (IntentSender.SendIntentException e) {
-                            // Handle the exception
-                        }
-                    }
-                });
-
-            }
-        });*/
     }
+
+    public static void setText(String s){
+        text = s;
+    }
+
+
 
     public void escriu(DriveContents dc) throws IOException {
         DriveContents driveContents = dc;

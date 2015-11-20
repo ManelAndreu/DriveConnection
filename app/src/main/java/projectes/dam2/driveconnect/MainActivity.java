@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                     DriveId driveId = (DriveId) data.getParcelableExtra(
                             OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
 
-                    Log.i("TAG","File created with ID: " + driveId);
+                    Log.i("TAG","File opened with ID: " + driveId);
                     Intent i = new Intent(getApplicationContext(), Main22Activity.class);
                     i.putExtra("id", driveId.encodeToString());
                     startActivityForResult(i, RESULT_OK);
