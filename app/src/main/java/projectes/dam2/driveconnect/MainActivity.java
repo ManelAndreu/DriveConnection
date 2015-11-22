@@ -12,7 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,10 +53,8 @@ public class MainActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_CREATOR = 1;
     public static final int REQUEST_CODE_OPENER = 3;
     public static final int CONNECTION_REQUEST_CODE = 2;
-    public static final int CREATE_FILE_REQUEST_CODE = 3;
-    public static final int REQUEST_CODE_EDITOR = 4;
     private static GoogleApiClient googleApiClient;
-    private Button create, read;
+    private Button read;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,21 +63,26 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        create = (Button) findViewById(R.id.create);
         read = (Button) findViewById(R.id.open);
 
         read.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                IntentSender intentSender = Drive.DriveApi
-                        .newOpenFileActivityBuilder()
-                        .setMimeType(new String[]{"text/plain", "text/html"})
-                        .build(getGoogleApiClient());
-                try {
-                    startIntentSenderForResult(
-                            intentSender, REQUEST_CODE_OPENER, null, 0, 0, 0);
-                } catch (IntentSender.SendIntentException e) {
-                    Log.w("", "Unable to send intent", e);
+                if (!googleApiClient.isConnected()) {
+
+                    Toast.makeText(getApplicationContext(), "S'esta conectant..., per favor espera.", Toast.LENGTH_SHORT).show();
+                    googleApiClient.connect();
+                } else {
+                    IntentSender intentSender = Drive.DriveApi
+                            .newOpenFileActivityBuilder()
+                            .setMimeType(new String[]{"text/plain", "text/html"})
+                            .build(getGoogleApiClient());
+                    try {
+                        startIntentSenderForResult(
+                                intentSender, REQUEST_CODE_OPENER, null, 0, 0, 0);
+                    } catch (IntentSender.SendIntentException e) {
+                        Log.w("", "Unable to send intent", e);
+                    }
                 }
             }
         });
@@ -85,12 +93,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Tractant d'accedir al servei, si us plau espera...", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-               /*     Intent i = new Intent(getApplicationContext(), Main22Activity.class);
-                    startActivity(i);*/
-                Toast.makeText(getApplicationContext(), "1", Toast.LENGTH_SHORT).show();
+                if (!googleApiClient.isConnected()) {
 
-                Drive.DriveApi.newDriveContents(getGoogleApiClient())
-                        .setResultCallback(driveContentsCallback);
+                    Toast.makeText(getApplicationContext(), "S'esta conectant..., per favor espera.", Toast.LENGTH_SHORT).show();
+                    googleApiClient.connect();
+                } else {
+                    Drive.DriveApi.newDriveContents(getGoogleApiClient())
+                            .setResultCallback(driveContentsCallback);
+                }
             }
         });
 
@@ -126,6 +136,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .build();
+
+        googleApiClient.connect();
 
     }
 
@@ -163,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                     DriveId driveId = (DriveId) data.getParcelableExtra(
                             OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
 
-                    Log.i("TAG","File created with ID: " + driveId);
+                    Log.i("TAG", "File created with ID: " + driveId);
                     Intent i = new Intent(getApplicationContext(), Main22Activity.class);
                     i.putExtra("id", driveId.encodeToString());
                     startActivityForResult(i, RESULT_OK);
@@ -174,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
                     DriveId driveId = (DriveId) data.getParcelableExtra(
                             OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
 
-                    Log.i("TAG","File opened with ID: " + driveId);
+                    Log.i("TAG", "File opened with ID: " + driveId);
                     Intent i = new Intent(getApplicationContext(), Main22Activity.class);
                     i.putExtra("id", driveId.encodeToString());
                     startActivityForResult(i, RESULT_OK);

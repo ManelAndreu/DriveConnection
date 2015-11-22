@@ -14,10 +14,12 @@ import com.google.android.gms.drive.DriveFile;
 
 import org.w3c.dom.Text;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +48,20 @@ public class Lectura extends AsyncTask<DriveFile, Void, Boolean> {
         try {
             ParcelFileDescriptor pfd = driveContents.getParcelFileDescriptor();
             FileInputStream fileInputStream = new FileInputStream(pfd.getFileDescriptor());
+            FileReader fr = new FileReader(pfd.getFileDescriptor());
+            BufferedReader br = new BufferedReader(fr);
             StringBuilder builder = new StringBuilder();
+            while(br.ready()){
+                String lectura = br.readLine();
+                builder.append(lectura);
+                builder.append(System.getProperty("line.separator"));
+            }
+            br.close();
+            text = builder.toString();
+            Main22Activity.text = text;
+            Log.i("TAG", text);
+
+            /*StringBuilder builder = new StringBuilder();
             int ch;
             while((ch = fileInputStream.read()) != -1){
                 builder.append((char)ch);
@@ -54,7 +69,7 @@ public class Lectura extends AsyncTask<DriveFile, Void, Boolean> {
 
             text = builder.toString();
             Main22Activity.text = text;
-            Log.i("TAG", text);
+            Log.i("TAG", text);*/
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,16 +79,6 @@ public class Lectura extends AsyncTask<DriveFile, Void, Boolean> {
 
 
 
-
-     /*       OutputStream outputStream = driveContents.getOutputStream();
-            outputStream.write(this.text.getBytes());
-            com.google.android.gms.common.api.Status status =
-                    driveContents.commit(googleApiClient, null).await();
-            this.s = status.getStatus().isSuccess();
-            return status.getStatus().isSuccess();
-        } catch (IOException e) {
-            Log.e(" ", "IOException while appending to the output stream", e);
-        }*/
         return false;
     }
 

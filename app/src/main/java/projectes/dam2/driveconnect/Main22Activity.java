@@ -106,15 +106,4 @@ public class Main22Activity extends AppCompatActivity {
         text = s;
     }
 
-
-
-    public void escriu(DriveContents dc) throws IOException {
-        DriveContents driveContents = dc;
-        OutputStream outputStream = driveContents.getOutputStream();
-        outputStream.write("Hello world".getBytes());
-        outputStream.flush();
-        driveContents.commit(googleApiClient, null);
-
-    }
-
 }
